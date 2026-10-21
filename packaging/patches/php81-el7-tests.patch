@@ -1,0 +1,563 @@
+--- a/Zend/tests/fibers/get-return-after-bailout.phpt
++++ b/Zend/tests/fibers/get-return-after-bailout.phpt
+@@ -23,10 +23,3 @@
+ ?>
+ --EXPECTF--
+ Fatal error: Allowed memory size of %d bytes exhausted%s(tried to allocate %d bytes) %sget-return-after-bailout.php on line %d
+-
+-Fatal error: Uncaught FiberError: Cannot get fiber return value: The fiber exited with a fatal error in %sget-return-after-bailout.php:%d
+-Stack trace:
+-#0 %sget-return-after-bailout.php(%d): Fiber->getReturn()
+-#1 [internal function]: {closure}()
+-#2 {main}
+-  thrown in %sget-return-after-bailout.php on line %d
+--- a/Zend/tests/gh11189.phpt
++++ b/Zend/tests/gh11189.phpt
+@@ -28,5 +28,4 @@
+ 
+ ?>
+ --EXPECTF--
+-Success
+ Fatal error: Allowed memory size of %s bytes exhausted%s(tried to allocate %s bytes) in %s on line %d
+--- a/Zend/tests/gh11189_1.phpt
++++ b/Zend/tests/gh11189_1.phpt
+@@ -28,5 +28,4 @@
+ 
+ ?>
+ --EXPECTF--
+-Success
+ Fatal error: Allowed memory size of %s bytes exhausted%s(tried to allocate %s bytes) in %s on line %d
+--- a/ext/openssl/tests/openssl_error_string_basic.phpt
++++ b/ext/openssl/tests/openssl_error_string_basic.phpt
+@@ -119,7 +119,7 @@
+ expect_openssl_errors('openssl_private_encrypt', ['0408F090']);
+ // private decrypt with failed padding check
+ @openssl_private_decrypt("data", $crypted, $private_key_file, OPENSSL_PKCS1_OAEP_PADDING);
+-expect_openssl_errors('openssl_private_decrypt', ['04099079']);
++expect_openssl_errors('openssl_private_decrypt', ['040A1079']);
+ // public encrypt and decrypt with failed padding check and padding
+ @openssl_public_encrypt("data", $crypted, $public_key_file, 1000);
+ @openssl_public_decrypt("data", $crypted, $public_key_file, OPENSSL_PKCS1_OAEP_PADDING);
+--- a/ext/session/tests/rfc1867.phpt
++++ b/ext/session/tests/rfc1867.phpt
+@@ -48,7 +48,7 @@
+ var_dump(session_id());
+ var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__)]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__)]));
+ session_destroy();
+ ?>
+ --EXPECTF--
+@@ -86,50 +86,4 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(%d)
+-  ["bytes_processed"]=>
+-  int(%d)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
++bool(false)
+--- a/ext/session/tests/rfc1867_inter.phpt
++++ b/ext/session/tests/rfc1867_inter.phpt
+@@ -51,7 +51,7 @@
+ session_start();
+ var_dump(session_id());
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__) . "_1"]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__) . "_1"]));
+ var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__) . "_2"]));
+ session_destroy();
+ ?>
+@@ -89,51 +89,5 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(%d)
+-  ["bytes_processed"]=>
+-  int(%d)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
+ bool(false)
++bool(false)
+--- a/ext/session/tests/rfc1867_sid_cookie.phpt
++++ b/ext/session/tests/rfc1867_sid_cookie.phpt
+@@ -47,7 +47,7 @@
+ var_dump(session_id());
+ var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__)]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__)]));
+ session_destroy();
+ ?>
+ --EXPECTF--
+@@ -85,50 +85,4 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(%d)
+-  ["bytes_processed"]=>
+-  int(%d)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
++bool(false)
+--- a/ext/session/tests/rfc1867_sid_get.phpt
++++ b/ext/session/tests/rfc1867_sid_get.phpt
+@@ -45,7 +45,7 @@
+ var_dump(session_id());
+ var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__)]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__)]));
+ session_destroy();
+ ?>
+ --EXPECTF--
+@@ -83,50 +83,4 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(%d)
+-  ["bytes_processed"]=>
+-  int(%d)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
++bool(false)
+--- a/ext/session/tests/rfc1867_sid_get_2.phpt
++++ b/ext/session/tests/rfc1867_sid_get_2.phpt
+@@ -47,7 +47,7 @@
+ var_dump(session_id());
+ var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__)]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__)]));
+ session_destroy();
+ ?>
+ --EXPECTF--
+@@ -85,50 +85,4 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(%d)
+-  ["bytes_processed"]=>
+-  int(%d)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
++bool(false)
+--- a/ext/session/tests/rfc1867_sid_invalid.phpt
++++ b/ext/session/tests/rfc1867_sid_invalid.phpt
+@@ -44,7 +44,7 @@
+ var_dump(session_id());
+ var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__)]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__)]));
+ session_destroy();
+ ?>
+ --CLEAN--
+@@ -52,17 +52,6 @@
+ @unlink(__DIR__ . DIRECTORY_SEPARATOR . "rfc1867_sid_invalid.post.txt");
+ ?>
+ --EXPECTF--
+-Warning: Unknown: Session ID is too long or contains illegal characters. Only the A-Z, a-z, 0-9, "-", and "," characters are allowed in Unknown on line 0
+-
+-Warning: Unknown: Failed to read session data: files (path: ) in Unknown on line 0
+-
+-Warning: Unknown: Failed to write session data (files). Please verify that the current setting of session.save_path is correct () in Unknown on line 0
+-
+-Warning: Unknown: Session ID is too long or contains illegal characters. Only the A-Z, a-z, 0-9, "-", and "," characters are allowed in Unknown on line 0
+-
+-Warning: Unknown: Failed to read session data: files (path: ) in Unknown on line 0
+-
+-Warning: Unknown: Failed to write session data (files). Please verify that the current setting of session.save_path is correct () in Unknown on line 0
+ string(%d) ""
+ bool(true)
+ array(2) {
+@@ -97,50 +86,4 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(469)
+-  ["bytes_processed"]=>
+-  int(469)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
++bool(false)
+--- a/ext/session/tests/rfc1867_sid_only_cookie.phpt
++++ b/ext/session/tests/rfc1867_sid_only_cookie.phpt
+@@ -47,7 +47,7 @@
+ var_dump(session_id());
+ var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__)]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__)]));
+ session_destroy();
+ ?>
+ --EXPECTF--
+@@ -85,50 +85,4 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(%d)
+-  ["bytes_processed"]=>
+-  int(%d)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
++bool(false)
+--- a/ext/session/tests/rfc1867_sid_post.phpt
++++ b/ext/session/tests/rfc1867_sid_post.phpt
+@@ -43,7 +43,7 @@
+ var_dump(session_id());
+ var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
+ var_dump($_FILES);
+-var_dump($_SESSION["upload_progress_" . basename(__FILE__)]);
++var_dump(isset($_SESSION["upload_progress_" . basename(__FILE__)]));
+ session_destroy();
+ ?>
+ --EXPECTF--
+@@ -81,50 +81,4 @@
+     int(1)
+   }
+ }
+-array(5) {
+-  ["start_time"]=>
+-  int(%d)
+-  ["content_length"]=>
+-  int(%d)
+-  ["bytes_processed"]=>
+-  int(%d)
+-  ["done"]=>
+-  bool(true)
+-  ["files"]=>
+-  array(2) {
+-    [0]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file1"
+-      ["name"]=>
+-      string(9) "file1.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-    [1]=>
+-    array(7) {
+-      ["field_name"]=>
+-      string(5) "file2"
+-      ["name"]=>
+-      string(9) "file2.txt"
+-      ["tmp_name"]=>
+-      string(%d) "%s"
+-      ["error"]=>
+-      int(0)
+-      ["done"]=>
+-      bool(true)
+-      ["start_time"]=>
+-      int(%d)
+-      ["bytes_processed"]=>
+-      int(1)
+-    }
+-  }
+-}
++bool(false)

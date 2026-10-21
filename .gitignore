@@ -1,0 +1,11 @@
+/build/
+/dist/
+/public/
+*.rpm
+*.log
+*.key
+*.pem
+.env*
+__pycache__/
+/PROJECT_MEMORY.md
+/roadmap.md

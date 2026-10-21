@@ -1,0 +1,9 @@
+.git
+.agents
+.codex
+.aws
+build
+dist
+public
+PROJECT_MEMORY.md
+roadmap.md

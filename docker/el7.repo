@@ -1,0 +1,56 @@
+[base]
+name=CentOS 7.9.2009 Base
+baseurl=https://vault.centos.org/7.9.2009/os/$basearch/
+        https://archive.kernel.org/centos-vault/7.9.2009/os/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+[updates]
+name=CentOS 7.9.2009 Updates
+baseurl=https://vault.centos.org/7.9.2009/updates/$basearch/
+        https://archive.kernel.org/centos-vault/7.9.2009/updates/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+[extras]
+name=CentOS 7.9.2009 Extras
+baseurl=https://vault.centos.org/7.9.2009/extras/$basearch/
+        https://archive.kernel.org/centos-vault/7.9.2009/extras/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+[epel]
+name=EPEL 7 Archive
+baseurl=https://archives.fedoraproject.org/pub/archive/epel/7/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[remi-safe]
+name=Remi EL7 Safe Archive
+baseurl=https://rpms.remirepo.net/enterprise/7/safe/$basearch/
+        https://repo.extreme-ix.org/remi/enterprise/7/safe/$basearch/
+ip_resolve=4
+enabled=1
+gpgcheck=1
+gpgkey=https://rpms.remirepo.net/RPM-GPG-KEY-remi
+
+[remi]
+name=Remi EL7 Archive
+baseurl=https://rpms.remirepo.net/enterprise/7/remi/$basearch/
+        https://repo.extreme-ix.org/remi/enterprise/7/remi/$basearch/
+ip_resolve=4
+enabled=1
+gpgcheck=1
+gpgkey=https://rpms.remirepo.net/RPM-GPG-KEY-remi
+
+[oracle-instantclient]
+name=Oracle Instant Client 21 OL7
+baseurl=https://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient21/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.oracle.com/RPM-GPG-KEY-oracle-ol7
+includepkgs=oracle-instantclient-basic oracle-instantclient-devel

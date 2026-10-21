@@ -1,0 +1,41 @@
+EL7 libcurl keeps its 7.29.0 version while backporting TLS 1.0/1.1/1.2
+selectors. Detect their declarations instead of relying only on the upstream
+version number. Do not change TLS policy or disable certificate verification.
+
+--- a/ext/curl/config.m4
++++ b/ext/curl/config.m4
+@@ -9,6 +9,14 @@
+ 
+   PHP_EVAL_LIBLINE($CURL_LIBS, CURL_SHARED_LIBADD)
+   PHP_EVAL_INCLINE($CURL_CFLAGS)
++
++  dnl Enterprise distributions can backport TLS constants without changing
++  dnl LIBCURL_VERSION_NUM. These constants are enum members, not macros.
++  save_CPPFLAGS="$CPPFLAGS"
++  CPPFLAGS="$CPPFLAGS $CURL_CFLAGS"
++  AC_CHECK_DECLS([CURL_SSLVERSION_TLSv1_0, CURL_SSLVERSION_TLSv1_1, CURL_SSLVERSION_TLSv1_2],
++    [], [], [[#include <curl/curl.h>]])
++  CPPFLAGS="$save_CPPFLAGS"
+ 
+   AC_MSG_CHECKING([for SSL support in libcurl])
+   case "$CURL_FEATURES" in
+--- a/ext/curl/interface.c
++++ b/ext/curl/interface.c
+@@ -954,9 +954,16 @@
+ 
+ #if LIBCURL_VERSION_NUM >= 0x072200 /* Available since 7.34.0 */
+ 	REGISTER_CURL_CONSTANT(CURLOPT_LOGIN_OPTIONS);
+-
++#endif
++
++/* Also expose TLS versions backported by enterprise libcurl packages. */
++#if LIBCURL_VERSION_NUM >= 0x072200 || HAVE_DECL_CURL_SSLVERSION_TLSV1_0
+ 	REGISTER_CURL_CONSTANT(CURL_SSLVERSION_TLSv1_0);
++#endif
++#if LIBCURL_VERSION_NUM >= 0x072200 || HAVE_DECL_CURL_SSLVERSION_TLSV1_1
+ 	REGISTER_CURL_CONSTANT(CURL_SSLVERSION_TLSv1_1);
++#endif
++#if LIBCURL_VERSION_NUM >= 0x072200 || HAVE_DECL_CURL_SSLVERSION_TLSV1_2
+ 	REGISTER_CURL_CONSTANT(CURL_SSLVERSION_TLSv1_2);
+ #endif
+ 

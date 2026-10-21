@@ -1,0 +1,34 @@
+FROM centos:7@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+
+ENV LANG=C LC_ALL=C
+
+RUN rm -f /etc/yum.repos.d/*.repo
+COPY docker/el7.repo /etc/yum.repos.d/el7.repo
+COPY docker/keys/ /etc/pki/rpm-gpg/
+RUN yum -y install ca-certificates curl yum-utils rpm-build rpm-sign \
+      redhat-rpm-config scl-utils-build php81-build cpio patch make gcc gcc-c++ \
+      createrepo gnupg2 findutils diffutils procps-ng fcgi \
+      oracle-instantclient-basic-21.16.0.0.0-1 \
+      oracle-instantclient-devel-21.16.0.0.0-1
+
+COPY packaging/SPECS/php.spec.in /tmp/php.spec.in
+RUN sed 's/@RELEASE@/7/' /tmp/php.spec.in > /tmp/php.spec && \
+    yum-builddep -y --define 'scl php81' --define '_with_oci8 1' /tmp/php.spec && \
+    yum clean all && rm -rf /var/cache/yum /tmp/php.spec*
+
+# CLI used by the container-only HTTPS/TLS regression fixture.
+RUN yum -y --disablerepo='*' --enablerepo=base,updates install openssl && \
+    yum clean all && rm -rf /var/cache/yum
+
+# EL7 RPM loads fileattrs before the spec creates these SCL macros.
+RUN sed -i -e 's|%{_root_sysconfdir}|/etc|g' \
+    -e 's|%{scl_runtime}|%{scl}-runtime|g' /usr/lib/rpm/fileattrs/scl.attr
+
+WORKDIR /work
+
+ARG BUILD_UID=1000
+ARG BUILD_GID=1000
+RUN if ! getent group "$BUILD_GID" >/dev/null; then groupadd -g "$BUILD_GID" builder; fi; \
+    if ! getent passwd "$BUILD_UID" >/dev/null; then \
+      useradd -M -u "$BUILD_UID" -g "$BUILD_GID" -d /tmp builder; \
+    fi

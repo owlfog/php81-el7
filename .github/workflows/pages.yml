@@ -1,0 +1,91 @@
+name: Build RPM and publish yum repo
+
+# Publication is explicit; pushing a commit never deploys this repository.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  RELEASE: "7"
+  RPM_GPG_NAME: ${{ vars.RPM_GPG_NAME }}
+  RPM_GPG_PRIVATE_KEY_B64: ${{ secrets.RPM_GPG_PRIVATE_KEY_B64 }}
+  PAGES_BASE_URL: ${{ vars.PAGES_BASE_URL }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set defaults
+        shell: bash
+        run: |
+          if [ -z "$RPM_GPG_NAME" ]; then
+            echo "RPM_GPG_NAME=Rosa Khutor RPM Signing" >> "$GITHUB_ENV"
+          fi
+
+          if [ -z "$PAGES_BASE_URL" ]; then
+            owner="${GITHUB_REPOSITORY_OWNER,,}"
+            repo="${GITHUB_REPOSITORY#*/}"
+            repo_lc="${repo,,}"
+
+            if [ "$repo_lc" = "${owner}.github.io" ]; then
+              echo "PAGES_BASE_URL=https://${owner}.github.io" >> "$GITHUB_ENV"
+            else
+              echo "PAGES_BASE_URL=https://${owner}.github.io/${repo}" >> "$GITHUB_ENV"
+            fi
+          fi
+
+      - name: Check signing secret
+        shell: bash
+        run: |
+          if [ -z "$RPM_GPG_PRIVATE_KEY_B64" ]; then
+            echo "::error::Set repository secret RPM_GPG_PRIVATE_KEY_B64 before publishing the yum repo."
+            exit 1
+          fi
+
+      - name: Build RPM
+        run: make rpm RELEASE="$RELEASE"
+
+      - name: Smoke test
+        run: make smoke
+
+      - name: Sign RPMs
+        run: make sign-rpms
+
+      - name: Create yum repo
+        run: make repo
+
+      - name: Sign yum repo metadata
+        run: make sign-repo
+
+      - name: Build public directory
+        run: make pages
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
